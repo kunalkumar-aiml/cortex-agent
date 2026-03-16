@@ -9,10 +9,8 @@ def main():
 
     plan = planner.create_plan(task)
 
-    print("\nGenerated Plan:\n")
-
-    for step in plan:
-        print("-", step)
+    print("\nAI Generated Plan:\n")
+    print(plan)
 
 
 if __name__ == "__main__":
