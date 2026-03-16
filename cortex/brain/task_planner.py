@@ -1,22 +1,27 @@
+from langchain_openai import ChatOpenAI
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
 class TaskPlanner:
-    """
-    TaskPlanner converts user goals into structured steps.
-    """
 
     def __init__(self):
-        self.name = "Cortex Planner"
+        self.llm = ChatOpenAI(temperature=0.3)
 
-    def create_plan(self, task: str):
-        """
-        Generate a basic execution plan from a user task.
-        """
+    def create_plan(self, task):
 
-        steps = [
-            "Understand the task",
-            "Search relevant information",
-            "Open required websites",
-            "Collect useful results",
-            "Return the best result"
-        ]
+        prompt = f"""
+You are an AI planning system.
 
-        return steps
+Break the following goal into clear steps.
+
+Goal:
+{task}
+
+Return a numbered list.
+"""
+
+        response = self.llm.invoke(prompt)
+
+        return response.content
