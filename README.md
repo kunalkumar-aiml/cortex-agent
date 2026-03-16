@@ -1,11 +1,37 @@
-# cortex-agent
-Cortex-Agent is an autonomous AI system that can understand user tasks, generate execution plans, and interact with computers and browsers to perform real-world operations.
+# Cortex-Agent
 
-## Current Development Phase
+Cortex-Agent is an experimental autonomous AI agent capable of planning and executing real-world computer tasks using local large language models.
 
-Phase 1: Core Architecture Setup
+## Features
 
-- Brain module (task planning)
-- Automation module (browser interaction)
-- Memory module
-- Main execution pipeline
+- AI task planning
+- Local LLM integration (Llama3)
+- Modular architecture
+- Automation framework
+- Memory system (in development)
+
+## Architecture
+
+User Task  
+↓  
+Planner (LLM reasoning)  
+↓  
+Execution Engine  
+↓  
+Tools (Browser / System)
+
+## Tech Stack
+
+Python  
+Ollama  
+Llama3  
+Playwright  
+Vector Memory (planned)
+
+## Roadmap
+
+Phase 1 – AI Planning System ✅  
+Phase 2 – Browser Automation Agent  
+Phase 3 – Memory System  
+Phase 4 – Tool-based Autonomous Agent  
+Phase 5 – Web Interface****
