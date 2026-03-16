@@ -12,14 +12,16 @@ Cortex-Agent is an experimental autonomous AI agent capable of planning and exec
 
 ## Architecture
 
-User Task  
-↓  
-Planner (LLM reasoning)  
-↓  
-Execution Engine  
-↓  
-Tools (Browser / System)
-
+                Cortex-Agent
+                     │
+        ┌────────────┼────────────┐
+        │            │            │
+      Brain        Memory        Tools
+   (AI Reason)   (Vector DB)   (Actions)
+        │            │            │
+        └────── Execution Engine ────┘
+                     │
+                Real World
 ## Tech Stack
 
 Python  
