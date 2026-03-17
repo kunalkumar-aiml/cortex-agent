@@ -15,16 +15,20 @@ class BrowserTool:
             search_url = f"https://duckduckgo.com/?q={query}"
             page.goto(search_url)
 
-            page.wait_for_timeout(2000)
+            page.wait_for_timeout(3000)
 
-            elements = page.locator("a[data-testid='result-title-a']")
+            links = page.locator("a")
 
-            count = elements.count()
+            count = links.count()
 
-            for i in range(min(5, count)):
-                title = elements.nth(i).inner_text()
-                if title:
-                    results.append(title)
+            for i in range(min(count, 20)):
+                text = links.nth(i).inner_text()
+
+                if text and len(text) > 20:
+                    results.append(text)
+
+                if len(results) >= 5:
+                    break
 
             browser.close()
 
