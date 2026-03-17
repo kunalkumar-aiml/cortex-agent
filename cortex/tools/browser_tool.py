@@ -12,19 +12,19 @@ class BrowserTool:
             browser = p.chromium.launch(headless=True)
             page = browser.new_page()
 
-            search_url = f"https://www.google.com/search?q={query}"
+            search_url = f"https://duckduckgo.com/?q={query}"
             page.goto(search_url)
 
-            page.wait_for_selector("h3")
+            page.wait_for_timeout(2000)
 
-            titles = page.locator("h3")
+            elements = page.locator("a[data-testid='result-title-a']")
 
-            count = titles.count()
+            count = elements.count()
 
-            for i in range(min(count, 5)):
-                text = titles.nth(i).inner_text()
-                if text:
-                    results.append(text)
+            for i in range(min(5, count)):
+                title = elements.nth(i).inner_text()
+                if title:
+                    results.append(title)
 
             browser.close()
 
