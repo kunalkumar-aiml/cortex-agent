@@ -15,10 +15,14 @@ class BrowserTool:
             search_url = f"https://www.google.com/search?q={query}"
             page.goto(search_url)
 
-            elements = page.query_selector_all("h3")
+            page.wait_for_timeout(2000)
 
-            for el in elements[:5]:
-                results.append(el.inner_text())
+            elements = page.locator("h3")
+
+            count = elements.count()
+
+            for i in range(min(5, count)):
+                results.append(elements.nth(i).inner_text())
 
             browser.close()
 
