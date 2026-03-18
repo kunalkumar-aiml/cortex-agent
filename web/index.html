@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Cortex Agent</title>
+
+<style>
+
+body{
+font-family: Arial;
+background:#0f0f0f;
+color:white;
+text-align:center;
+padding:40px;
+}
+
+input{
+width:400px;
+padding:12px;
+font-size:16px;
+border-radius:5px;
+border:none;
+}
+
+button{
+padding:12px 20px;
+font-size:16px;
+margin-left:10px;
+background:#00ff9c;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+#result{
+margin-top:40px;
+white-space:pre-wrap;
+font-size:18px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Cortex Agent</h1>
+
+<p>Ask anything</p>
+
+<input id="query" placeholder="Example: top 5 laptops under 80000">
+
+<button onclick="ask()">Ask</button>
+
+<div id="result"></div>
+
+<script>
+
+async function ask(){
+
+const query=document.getElementById("query").value;
+
+const res=await fetch("http://127.0.0.1:8000/ask",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+task:query
+})
+
+});
+
+const data=await res.json();
+
+document.getElementById("result").innerText=data.result;
+
+}
+
+</script>
+
+</body>
+
+</html>
