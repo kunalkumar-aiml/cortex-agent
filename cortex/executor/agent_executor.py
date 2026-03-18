@@ -13,12 +13,11 @@ class AgentExecutor:
 
         print("\nChecking memory...\n")
 
-        past = self.memory.load()
+        memory_result = self.memory.search(task)
 
-        for item in past:
-            if task.lower() in item["task"].lower():
-                print("Found similar task in memory\n")
-                return item["result"]
+        if memory_result:
+            print("Memory match found\n")
+            return memory_result
 
         print("\nCreating execution plan...\n")
 
