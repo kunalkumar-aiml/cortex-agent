@@ -1,13 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-
-from cortex.tools.browser_tool import BrowserTool
-from cortex.executor.agent_executor import AgentExecutor
+import requests
+from bs4 import BeautifulSoup
 
 app = FastAPI()
 
-# allow frontend access
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -16,25 +13,28 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-tools = {
-    "browser": BrowserTool()
-}
-
-executor = AgentExecutor(tools)
-
-
-class Query(BaseModel):
-    task: str
-
-
 @app.get("/")
-def home():
+def root():
     return {"message": "Cortex AI Agent Running"}
 
-
 @app.post("/ask")
-async def ask(q: Query):
+def ask(data: dict):
 
-    result = executor.run(q.task)
+    query = data.get("task")
 
-    return {"result": result}
+    url = f"https://www.google.com/search?q={query}"
+
+    headers = {
+        "User-Agent":"Mozilla/5.0"
+    }
+
+    r = requests.get(url, headers=headers)
+
+    soup = BeautifulSoup(r.text,"html.parser")
+
+    results = []
+
+    for g in soup.select("h3")[:10]:
+        results.append(g.text)
+
+    return {"result":results}
