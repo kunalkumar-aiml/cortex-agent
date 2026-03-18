@@ -6,33 +6,23 @@ class BrowserTool:
 
     def search_google(self, query):
 
+        url = f"https://www.google.com/search?q={query}"
+
         headers = {
             "User-Agent": "Mozilla/5.0"
         }
 
-        # force latest results
-        query = query + " 2025 2026 latest laptop specs"
+        r = requests.get(url, headers=headers)
 
-        url = f"https://www.google.com/search?q={query}&num=10"
-
-        response = requests.get(url, headers=headers)
-
-        soup = BeautifulSoup(response.text, "html.parser")
+        soup = BeautifulSoup(r.text, "html.parser")
 
         results = []
 
-        for g in soup.select("div.g"):
+        for g in soup.select("div.tF2Cxc")[:5]:
 
             title = g.select_one("h3")
-            desc = g.select_one("span")
 
             if title:
-                text = title.text
+                results.append(title.text)
 
-                # remove old models
-                if "2021" in text or "2022" in text or "2023" in text:
-                    continue
-
-                results.append(text)
-
-        return results[:10]
+        return results
