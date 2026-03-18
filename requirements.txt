@@ -1,11 +1,4 @@
 fastapi
 uvicorn
-playwright
-beautifulsoup4
 requests
-sentence-transformers
-numpy
-ollama
-langchain
-langchain-community
-langchain-ollama
+beautifulsoup4
