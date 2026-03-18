@@ -8,38 +8,60 @@
 <style>
 
 body{
-background: radial-gradient(circle,#0f2027,#203a43,#2c5364);
-color:white;
+margin:0;
+background:#0f172a;
 font-family:Arial;
+color:white;
+overflow:hidden;
+}
+
+#ui{
+position:absolute;
+top:40%;
+left:50%;
+transform:translate(-50%,-50%);
 text-align:center;
-margin-top:100px;
+z-index:10;
 }
 
 input{
-width:400px;
-padding:10px;
+width:420px;
+padding:14px;
 font-size:18px;
+border:none;
+border-radius:10px;
 }
 
 button{
-padding:10px 20px;
+padding:14px 24px;
 font-size:18px;
-background:#00f2ff;
 border:none;
+border-radius:10px;
+background:#22c55e;
+color:white;
 cursor:pointer;
+margin-left:10px;
 }
 
 #result{
-margin-top:40px;
+margin-top:30px;
 font-size:18px;
+max-width:700px;
+}
+
+canvas{
+position:absolute;
+top:0;
+left:0;
 }
 
 </style>
 
 </head>
 
-
 <body>
+
+<div id="ui">
 
 <h1>Cortex AI Agent</h1>
 
@@ -49,8 +71,62 @@ font-size:18px;
 
 <div id="result"></div>
 
+</div>
+
+<canvas id="bg"></canvas>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+
 
 <script>
+
+/* 3D Background */
+
+const scene = new THREE.Scene()
+
+const camera = new THREE.PerspectiveCamera(
+75,
+window.innerWidth/window.innerHeight,
+0.1,
+1000
+)
+
+const renderer = new THREE.WebGLRenderer({
+canvas:document.getElementById("bg")
+})
+
+renderer.setSize(window.innerWidth,window.innerHeight)
+
+const geometry = new THREE.TorusKnotGeometry(10,3,100,16)
+
+const material = new THREE.MeshBasicMaterial({
+color:0x22c55e,
+wireframe:true
+})
+
+const knot = new THREE.Mesh(geometry,material)
+
+scene.add(knot)
+
+camera.position.z = 30
+
+function animate(){
+
+requestAnimationFrame(animate)
+
+knot.rotation.x += 0.01
+knot.rotation.y += 0.01
+
+renderer.render(scene,camera)
+
+}
+
+animate()
+
+
+
+/* API CALL */
 
 async function ask(){
 
@@ -78,7 +154,7 @@ data.result.forEach(r=>{
 html += "<p>"+r.name+"</p>"
 })
 
-document.getElementById("result").innerHTML=html
+document.getElementById("result").innerHTML = html
 
 }
 
