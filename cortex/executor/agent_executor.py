@@ -1,67 +1,74 @@
-from cortex.memory.memory_store import MemoryStore
-from cortex.utils.ranker import rank_products
+from langchain_ollama import ChatOllama
 
 
 class AgentExecutor:
 
-    def __init__(self, planner, tools, llm):
+    def __init__(self, tools):
 
-        self.planner = planner
         self.tools = tools
-        self.memory = MemoryStore()
-        self.llm = llm
+
+        # Local LLM
+        self.llm = ChatOllama(model="llama3")
+
 
     def run(self, task):
 
         print("\nChecking memory...\n")
 
-        memory_result = self.memory.search(task)
-
-        if memory_result:
-
-            print("Memory match found\n")
-
-            return memory_result
-
         print("\nSearching using tools...\n")
 
+        # Search using browser tool
         search_results = self.tools["browser"].search_google(task)
 
-        ranked = rank_products(search_results)
-
-        context = "\n".join(ranked[:10])
-
+        # Prompt for LLM
         prompt = f"""
-User query: {task}
+You are an expert technology analyst and hardware reviewer.
 
-Search results:
-{context}
+User Query:
+{task}
 
-Instructions:
+You must recommend the BEST and LATEST products available right now.
 
-Give the latest recommendations based on search results.
+Important Rules:
+- Only include models from 2024, 2025 or 2026
+- Ignore old laptops
+- Prefer latest CPU generation (Intel 13th/14th gen or Ryzen 7000/8000)
+- Prefer RTX GPU if available
+- Recommend only real laptops available in the market
 
-Rules:
+Search Results:
+{search_results}
 
-- Prefer products released after 2023
-- Include specifications
-- Explain why it is best
-- Return top 5 products
+Your job:
 
-Format:
+Give TOP 5 BEST OPTIONS.
 
-Product Name
+For each laptop provide:
+
+1. Laptop Name
+2. CPU
+3. GPU
+4. RAM
+5. Storage
+6. Display
+7. Why it is best
+
+Format example:
+
+1. Laptop Name
 
 CPU:
 GPU:
 RAM:
-Why best:
+Storage:
+Display:
+
+Why it is best:
+
+Do NOT include old models.
+Always prioritize the newest hardware.
 """
 
-        answer = self.llm.invoke(prompt)
+        response = self.llm.invoke(prompt)
 
-        result = answer.content
-
-        self.memory.save(task, result)
-
-        return result
+        return response.content
