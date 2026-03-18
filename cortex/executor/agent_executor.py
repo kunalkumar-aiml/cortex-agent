@@ -9,15 +9,6 @@ class AgentExecutor:
         self.tools = tools
         self.memory = MemoryStore()
 
-    def select_tool(self, task):
-
-        task = task.lower()
-
-        if "search" in task or "find" in task or "best" in task:
-            return "browser"
-
-        return None
-
     def run(self, task):
 
         print("\nChecking memory...\n")
@@ -28,50 +19,50 @@ class AgentExecutor:
             print("Memory match found\n")
             return memory_result
 
-        print("\nCreating execution plan...\n")
-
-        plan = self.planner.create_plan(task)
-
-        print("PLAN:\n")
-        print(plan)
-
-        tool = self.select_tool(task)
+        iteration = 0
+        max_iterations = 3
 
         results = []
 
-        if tool == "browser":
+        while iteration < max_iterations:
 
-            print("\nUsing Browser Tool...\n")
+            print(f"\nAgent Iteration {iteration+1}\n")
 
-            res = self.tools["browser"].search_google(task)
+            print("Creating execution plan...\n")
 
-            results.extend(res)
+            plan = self.planner.create_plan(task)
 
-        if not results:
+            print("PLAN:\n")
+            print(plan)
 
-            print("\nGenerating AI recommendation...\n")
+            print("\nExecuting tools...\n")
 
-            prompt = f"""
-You are a technology expert.
+            if "search" in task.lower() or "find" in task.lower():
 
-Task: {task}
+                if "browser" in self.tools:
 
-Provide the TOP 5 best laptop recommendations.
+                    res = self.tools["browser"].search_google(task)
 
-Rules:
-- Only return laptop model names
-- Include CPU and GPU
-- Do NOT explain steps
-- Format as numbered list
+                    results.extend(res)
 
-Example:
-1. Laptop Model (CPU, GPU)
+            if results:
+                break
+
+            iteration += 1
+
+        print("\nGenerating final recommendation...\n")
+
+        final_prompt = f"""
+User task: {task}
+
+Tool results:
+{results}
+
+Provide the final answer and recommendations clearly.
 """
 
-            answer = self.planner.create_plan(prompt)
-
-            results.append(answer)
+        answer = self.planner.create_plan(final_prompt)
 
         self.memory.save(task, results)
 
-        return results
+        return [answer]
