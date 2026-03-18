@@ -1,7 +1,11 @@
-langchain
-langchain-openai
-openai
-python-dotenv
+fastapi
+uvicorn
 playwright
-opencv-python
+beautifulsoup4
+requests
+sentence-transformers
 numpy
+ollama
+langchain
+langchain-community
+langchain-ollama
