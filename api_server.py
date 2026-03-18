@@ -18,11 +18,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Local LLM (Ollama)
+# Local LLM
 llm = ChatOllama(model="llama3")
 
 # Components
-planner = TaskPlanner(llm)
+planner = TaskPlanner()
 
 tools = {
     "browser": BrowserTool()
