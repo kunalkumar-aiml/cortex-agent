@@ -1,11 +1,24 @@
+from cortex.memory.memory_store import MemoryStore
+
+
 class AgentExecutor:
 
     def __init__(self, planner, tools):
 
         self.planner = planner
         self.tools = tools
+        self.memory = MemoryStore()
 
     def run(self, task):
+
+        print("\nChecking memory...\n")
+
+        past = self.memory.load()
+
+        for item in past:
+            if task.lower() in item["task"].lower():
+                print("Found similar task in memory\n")
+                return item["result"]
 
         print("\nCreating execution plan...\n")
 
@@ -25,5 +38,7 @@ class AgentExecutor:
                 res = self.tools["browser"].search_google(task)
 
                 results.extend(res)
+
+        self.memory.save(task, results)
 
         return results
