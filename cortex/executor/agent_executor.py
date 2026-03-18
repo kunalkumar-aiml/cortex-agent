@@ -1,5 +1,6 @@
 from cortex.memory.memory_store import MemoryStore
 from cortex.utils.ranker import ProductRanker
+from cortex.memory.feedback_store import FeedbackStore
 
 
 class AgentExecutor:
@@ -10,17 +11,9 @@ class AgentExecutor:
         self.tools = tools
         self.memory = MemoryStore()
         self.ranker = ProductRanker()
+        self.feedback = FeedbackStore()
 
     def run(self, task):
-
-        print("\nChecking memory...\n")
-
-        # disable memory for fresh answers
-        memory_result = None
-
-        if memory_result:
-            print("Memory match found\n")
-            return memory_result
 
         print("\nSearching using tools...\n")
 
@@ -36,49 +29,52 @@ class AgentExecutor:
 
             results.extend(ranked)
 
-        print("\nGenerating AI recommendation...\n")
-
         final_prompt = f"""
 User Query: {task}
 
 Detected Products:
 {results}
 
-You are an expert recommendation AI.
+Rules:
 
-STRICT RULES:
+Return only recommendations.
 
-- Do NOT explain steps
-- Do NOT show planning
-- Do NOT write long paragraphs
-- Only give recommendations
-
-If the user asks for TOP or BEST items:
-
-Return exactly this format:
+Format:
 
 Top 5 Best Options:
 
-1. Product Name
-2. Product Name
-3. Product Name
-4. Product Name
-5. Product Name
+1. Product
+2. Product
+3. Product
+4. Product
+5. Product
 
-After that, check if slightly increasing the budget would give much better options.
+If slightly increasing the budget gives better options:
 
-If yes, add:
+Better options if budget increases slightly:
 
-Better options if you can increase the budget slightly (₹2000–₹5000):
-
-• Product Name
-• Product Name
-
-Only return the recommendations.
+• Product
+• Product
 """
 
         answer = self.planner.create_plan(final_prompt)
 
-        self.memory.save(task, answer)
+        print("\nRecommendation:\n")
+        print(answer)
+
+        # Feedback learning
+        print("\nDid you like the recommendations? (y/n)")
+
+        feedback = input().strip().lower()
+
+        if feedback == "y":
+
+            for product in results[:5]:
+                self.feedback.save_feedback(product, 1)
+
+        elif feedback == "n":
+
+            for product in results[:5]:
+                self.feedback.save_feedback(product, -1)
 
         return [answer]
