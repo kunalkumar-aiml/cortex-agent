@@ -19,50 +19,45 @@ class AgentExecutor:
             print("Memory match found\n")
             return memory_result
 
-        iteration = 0
-        max_iterations = 3
+        print("\nSearching using tools...\n")
 
         results = []
 
-        while iteration < max_iterations:
+        # Run browser search
+        if "browser" in self.tools:
+            res = self.tools["browser"].search_google(task)
+            results.extend(res)
 
-            print(f"\nAgent Iteration {iteration+1}\n")
-
-            print("Creating execution plan...\n")
-
-            plan = self.planner.create_plan(task)
-
-            print("PLAN:\n")
-            print(plan)
-
-            print("\nExecuting tools...\n")
-
-            if "search" in task.lower() or "find" in task.lower():
-
-                if "browser" in self.tools:
-
-                    res = self.tools["browser"].search_google(task)
-
-                    results.extend(res)
-
-            if results:
-                break
-
-            iteration += 1
-
-        print("\nGenerating final recommendation...\n")
+        print("\nGenerating final answer...\n")
 
         final_prompt = f"""
-User task: {task}
+User Query: {task}
 
-Tool results:
+Search Results:
 {results}
 
-Provide the final answer and recommendations clearly.
+IMPORTANT RULES:
+- Do NOT explain steps
+- Do NOT give planning
+- Do NOT write long paragraphs
+- Only give the final answer
+
+If the user asks for TOP or BEST items,
+return a clean numbered list.
+
+Example format:
+
+1. Item name
+2. Item name
+3. Item name
+4. Item name
+5. Item name
+
+Only return the list.
 """
 
         answer = self.planner.create_plan(final_prompt)
 
-        self.memory.save(task, results)
+        self.memory.save(task, answer)
 
         return [answer]
