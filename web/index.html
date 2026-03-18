@@ -7,44 +7,55 @@
 <style>
 
 body{
-background:linear-gradient(120deg,#0f0c29,#302b63,#24243e);
+
+background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
 height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
 font-family:sans-serif;
 color:white;
+
 }
 
 .container{
+
 width:700px;
-backdrop-filter:blur(20px);
 background:rgba(255,255,255,0.05);
+backdrop-filter:blur(20px);
 border-radius:20px;
 padding:40px;
 box-shadow:0 0 40px rgba(0,0,0,0.5);
+
 }
 
 input{
+
 width:100%;
 padding:15px;
 border:none;
 border-radius:10px;
 font-size:18px;
+
 }
 
 button{
+
 margin-top:20px;
 padding:12px 25px;
 background:#00f2ff;
 border:none;
 border-radius:10px;
 cursor:pointer;
+font-size:16px;
+
 }
 
 .result{
+
 margin-top:30px;
 white-space:pre-wrap;
+
 }
 
 </style>
@@ -72,9 +83,11 @@ async function ask(){
 let q=document.getElementById("query").value
 
 let res=await fetch("http://127.0.0.1:8000/ask",{
+
 method:"POST",
 headers:{'Content-Type':'application/json'},
 body:JSON.stringify({task:q})
+
 })
 
 let data=await res.json()
@@ -86,5 +99,4 @@ document.getElementById("result").innerText=data.result
 </script>
 
 </body>
-
 </html>
