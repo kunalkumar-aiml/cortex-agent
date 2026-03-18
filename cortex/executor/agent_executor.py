@@ -1,80 +1,67 @@
 from cortex.memory.memory_store import MemoryStore
-from cortex.utils.ranker import ProductRanker
-from cortex.memory.feedback_store import FeedbackStore
 
 
 class AgentExecutor:
 
-    def __init__(self, planner, tools):
-
+    def __init__(self, planner, tools, llm):
         self.planner = planner
         self.tools = tools
         self.memory = MemoryStore()
-        self.ranker = ProductRanker()
-        self.feedback = FeedbackStore()
+        self.llm = llm
 
     def run(self, task):
+
+        print("\nChecking memory...\n")
+
+        memory_result = self.memory.search(task)
+
+        if memory_result:
+            print("Memory match found\n")
+            return memory_result
 
         print("\nSearching using tools...\n")
 
         results = []
 
         if "browser" in self.tools:
+            results = self.tools["browser"].search_google(task)
 
-            res = self.tools["browser"].search_google(task)
+        context = "\n".join(results[:10])
 
-            products = self.ranker.extract_products(res)
+        prompt = f"""
+User query: {task}
 
-            ranked = self.ranker.rank_products(products)
+Search results:
+{context}
 
-            results.extend(ranked)
-
-        final_prompt = f"""
-User Query: {task}
-
-Detected Products:
-{results}
+Instructions:
+Give a SHORT direct answer.
 
 Rules:
+- If user asks TOP items → return only the list
+- Do not explain steps
+- No long paragraphs
+- Maximum 6–8 lines
 
-Return only recommendations.
+Example output format:
 
-Format:
+Top 5 laptops under ₹80,000
 
-Top 5 Best Options:
+1. Laptop Name
+2. Laptop Name
+3. Laptop Name
+4. Laptop Name
+5. Laptop Name
 
-1. Product
-2. Product
-3. Product
-4. Product
-5. Product
-
-If slightly increasing the budget gives better options:
-
-Better options if budget increases slightly:
-
-• Product
-• Product
+If budget increases slightly:
+• Better Option 1
+• Better Option 2
 """
 
-        answer = self.planner.create_plan(final_prompt)
+        answer = self.llm.invoke(prompt)
 
-        print("\nRecommendation:\n")
-        print(answer)
+        result = answer.content
 
-        # Feedback learning
-        print("\nDid you like the recommendations? (y/n)")
+        self.memory.save(task, result)
 
-        feedback = input().strip().lower()
-
-        if feedback == "y":
-
-            for product in results[:5]:
-                self.feedback.save_feedback(product, 1)
-
-        elif feedback == "n":
-
-            for product in results[:5]:
-                self.feedback.save_feedback(product, -1)
-
-        return [answer]
+        return result
