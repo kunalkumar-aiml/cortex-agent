@@ -146,11 +146,21 @@ let data = await res.json()
 
 let html=""
 
+if(data.result){
+
 data.result.forEach(r=>{
 html += "<p>• "+r+"</p>"
 })
 
-document.getElementById("result").innerHTML=html
+}
+
+else{
+
+html="No results found"
+
+}
+
+document.getElementById("result").innerHTML = html
 
 }
 
