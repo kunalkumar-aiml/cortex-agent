@@ -26,17 +26,13 @@ class AgentExecutor:
         print("PLAN:\n")
         print(plan)
 
-        print("\nExecuting tools...\n")
+        print("\nGenerating answer using AI...\n")
 
-        results = []
+        answer = self.planner.create_plan(
+            f"Give top 5 best options with model names for: {task}"
+        )
 
-        if "search" in task.lower() or "find" in task.lower():
-
-            if "browser" in self.tools:
-
-                res = self.tools["browser"].search_google(task)
-
-                results.extend(res)
+        results = [answer]
 
         self.memory.save(task, results)
 
