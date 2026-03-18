@@ -1,4 +1,5 @@
 from playwright.sync_api import sync_playwright
+from bs4 import BeautifulSoup
 
 
 class BrowserTool:
@@ -10,22 +11,20 @@ class BrowserTool:
         with sync_playwright() as p:
 
             browser = p.chromium.launch(headless=True)
+
             page = browser.new_page()
 
-            # Use DuckDuckGo HTML version (stable for scraping)
-            url = f"https://duckduckgo.com/html/?q={query}"
-
-            page.goto(url)
+            page.goto(f"https://www.google.com/search?q={query}")
 
             page.wait_for_timeout(3000)
 
-            elements = page.locator("a.result__a")
+            html = page.content()
 
-            count = elements.count()
+            soup = BeautifulSoup(html, "html.parser")
 
-            for i in range(min(count, 5)):
-                text = elements.nth(i).inner_text()
-                results.append(text)
+            for h in soup.find_all("h3")[:15]:
+
+                results.append(h.text)
 
             browser.close()
 
