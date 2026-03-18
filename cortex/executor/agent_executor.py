@@ -1,4 +1,5 @@
 from cortex.memory.memory_store import MemoryStore
+from cortex.utils.ranker import ProductRanker
 
 
 class AgentExecutor:
@@ -8,6 +9,7 @@ class AgentExecutor:
         self.planner = planner
         self.tools = tools
         self.memory = MemoryStore()
+        self.ranker = ProductRanker()
 
     def run(self, task):
 
@@ -27,39 +29,41 @@ class AgentExecutor:
 
             res = self.tools["browser"].search_google(task)
 
-            results.extend(res)
+            products = self.ranker.extract_products(res)
+
+            ranked = self.ranker.rank_products(products)
+
+            results.extend(ranked)
 
         print("\nGenerating AI recommendation...\n")
 
         final_prompt = f"""
 User Query: {task}
 
-Search Results:
+Detected Products:
 {results}
 
-Rules for answering:
-
-1. Give direct recommendations.
-2. If the user asks for TOP or BEST items, return a numbered list.
-3. Keep the answer short and clean.
-4. If the budget is mentioned (example: under 80k), recommend items within that budget.
-5. After the main list, suggest 1-2 better options if the user can increase the budget slightly (₹2k-₹5k more).
-6. Do not explain planning or steps.
+Rules:
+- Return only useful recommendations
+- If user asks for TOP items, return a numbered list
+- Keep the answer short
+- Recommend products within the user's budget
+- If slightly increasing the budget gives better products, suggest them
 
 Example format:
 
 Top 5 Best Options:
 
-1. Item name
-2. Item name
-3. Item name
-4. Item name
-5. Item name
+1. Product name
+2. Product name
+3. Product name
+4. Product name
+5. Product name
 
-If you can increase your budget slightly, these are even better:
+If you can increase the budget slightly, these are better:
 
-• Item name
-• Item name
+• Product name
+• Product name
 """
 
         answer = self.planner.create_plan(final_prompt)
