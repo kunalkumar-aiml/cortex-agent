@@ -1,26 +1,25 @@
 from cortex.brain.task_planner import TaskPlanner
 from cortex.tools.browser_tool import BrowserTool
+from cortex.executor.agent_executor import AgentExecutor
 
 
 def main():
 
     planner = TaskPlanner()
+
     browser = BrowserTool()
+
+    tools = {
+        "browser": browser
+    }
+
+    executor = AgentExecutor(planner, tools)
 
     task = input("Enter your task: ")
 
-    print("\nGenerating AI Plan...\n")
+    results = executor.run(task)
 
-    plan = planner.create_plan(task)
-
-    print("AI Generated Plan:\n")
-    print(plan)
-
-    print("\nRunning browser search...\n")
-
-    results = browser.search_google(task)
-
-    print("Top Search Results:\n")
+    print("\nResults:\n")
 
     for r in results:
         print("-", r)
