@@ -13,8 +13,10 @@ class ProductRanker:
             matches = re.findall(r"[A-Z][A-Za-z0-9\\- ]{4,}", text)
 
             for m in matches:
-                if len(m.split()) <= 6:
-                    products.append(m.strip())
+                clean = m.strip()
+
+                if len(clean.split()) <= 6:
+                    products.append(clean)
 
         return products
 
