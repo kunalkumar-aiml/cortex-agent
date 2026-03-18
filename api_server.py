@@ -22,7 +22,7 @@ def ask(data: dict):
 
     query = data.get("task")
 
-    url = f"https://www.google.com/search?q={query}"
+    url = f"https://duckduckgo.com/html/?q={query}"
 
     headers = {
         "User-Agent":"Mozilla/5.0"
@@ -34,7 +34,7 @@ def ask(data: dict):
 
     results = []
 
-    for g in soup.select("h3")[:10]:
-        results.append(g.text)
+    for a in soup.select(".result__a")[:10]:
+        results.append(a.get_text())
 
     return {"result":results}
