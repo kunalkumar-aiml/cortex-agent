@@ -26,11 +26,25 @@ class AgentExecutor:
         print("PLAN:\n")
         print(plan)
 
-        print("\nGenerating answer using AI...\n")
+        print("\nGenerating final recommendation...\n")
 
-        answer = self.planner.create_plan(
-            f"Give top 5 best options with model names for: {task}"
-        )
+        prompt = f"""
+You are a tech expert.
+
+Task: {task}
+
+Give the TOP 5 BEST laptops under ₹80,000 for gaming.
+
+Rules:
+- Only return laptop model names
+- Include CPU and GPU
+- Do NOT explain steps
+- Format as numbered list
+Example:
+1. Laptop Model (CPU, GPU)
+"""
+
+        answer = self.planner.create_plan(prompt)
 
         results = [answer]
 
