@@ -5,7 +5,7 @@ from cortex.brain.task_planner import TaskPlanner
 from cortex.tools.browser_tool import BrowserTool
 from cortex.executor.agent_executor import AgentExecutor
 
-from langchain_community.chat_models import ChatOllama
+from langchain_ollama import ChatOllama
 
 
 app = FastAPI()
@@ -18,10 +18,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Local LLM
 llm = ChatOllama(model="llama3")
 
-# Components
 planner = TaskPlanner()
 
 tools = {
