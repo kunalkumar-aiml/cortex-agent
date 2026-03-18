@@ -15,7 +15,8 @@ class AgentExecutor:
 
         print("\nChecking memory...\n")
 
-        memory_result = self.memory.search(task)
+        # disable memory for fresh answers
+        memory_result = None
 
         if memory_result:
             print("Memory match found\n")
@@ -43,27 +44,37 @@ User Query: {task}
 Detected Products:
 {results}
 
-Rules:
-- Return only useful recommendations
-- If user asks for TOP items, return a numbered list
-- Keep the answer short
-- Recommend products within the user's budget
-- If slightly increasing the budget gives better products, suggest them
+You are an expert recommendation AI.
 
-Example format:
+STRICT RULES:
+
+- Do NOT explain steps
+- Do NOT show planning
+- Do NOT write long paragraphs
+- Only give recommendations
+
+If the user asks for TOP or BEST items:
+
+Return exactly this format:
 
 Top 5 Best Options:
 
-1. Product name
-2. Product name
-3. Product name
-4. Product name
-5. Product name
+1. Product Name
+2. Product Name
+3. Product Name
+4. Product Name
+5. Product Name
 
-If you can increase the budget slightly, these are better:
+After that, check if slightly increasing the budget would give much better options.
 
-• Product name
-• Product name
+If yes, add:
+
+Better options if you can increase the budget slightly (₹2000–₹5000):
+
+• Product Name
+• Product Name
+
+Only return the recommendations.
 """
 
         answer = self.planner.create_plan(final_prompt)
