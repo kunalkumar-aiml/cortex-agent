@@ -1,47 +1,35 @@
 import re
-from collections import Counter
-from cortex.memory.feedback_store import FeedbackStore
 
+def rank_products(products):
 
-class ProductRanker:
+    ranked = []
 
-    def __init__(self):
+    for p in products:
 
-        self.feedback = FeedbackStore()
+        score = 0
 
-    def extract_products(self, search_results):
+        text = p.lower()
 
-        products = []
+        if "rtx 4050" in text:
+            score += 10
 
-        for text in search_results:
+        if "rtx 3050" in text:
+            score += 8
 
-            matches = re.findall(r"[A-Z][A-Za-z0-9\\- ]{4,}", text)
+        if "ryzen 7" in text:
+            score += 7
 
-            for m in matches:
+        if "i7" in text:
+            score += 7
 
-                clean = m.strip()
+        if "ryzen 5" in text:
+            score += 6
 
-                if len(clean.split()) <= 6:
-                    products.append(clean)
+        if "i5" in text:
+            score += 6
 
-        return products
+        ranked.append((p, score))
 
-    def rank_products(self, products):
+    ranked.sort(key=lambda x: x[1], reverse=True)
 
-        counts = Counter(products)
-
-        scores = self.feedback.get_scores()
-
-        ranked = []
-
-        for product, freq in counts.items():
-
-            feedback_bonus = scores.get(product, 0)
-
-            total_score = freq + feedback_bonus
-
-            ranked.append((product, total_score))
-
-        ranked.sort(key=lambda x: x[1], reverse=True)
-
-        return [p[0] for p in ranked[:10]]
+    return [x[0] for x in ranked]
