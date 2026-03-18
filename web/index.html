@@ -1,41 +1,50 @@
 <!DOCTYPE html>
 <html>
-
 <head>
+
 <title>Cortex Agent</title>
 
 <style>
 
 body{
-font-family: Arial;
-background:#0f0f0f;
+background:linear-gradient(120deg,#0f0c29,#302b63,#24243e);
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+font-family:sans-serif;
 color:white;
-text-align:center;
+}
+
+.container{
+width:700px;
+backdrop-filter:blur(20px);
+background:rgba(255,255,255,0.05);
+border-radius:20px;
 padding:40px;
+box-shadow:0 0 40px rgba(0,0,0,0.5);
 }
 
 input{
-width:400px;
-padding:12px;
-font-size:16px;
-border-radius:5px;
+width:100%;
+padding:15px;
 border:none;
+border-radius:10px;
+font-size:18px;
 }
 
 button{
-padding:12px 20px;
-font-size:16px;
-margin-left:10px;
-background:#00ff9c;
+margin-top:20px;
+padding:12px 25px;
+background:#00f2ff;
 border:none;
-border-radius:5px;
+border-radius:10px;
 cursor:pointer;
 }
 
-#result{
-margin-top:40px;
+.result{
+margin-top:30px;
 white-space:pre-wrap;
-font-size:18px;
 }
 
 </style>
@@ -44,39 +53,33 @@ font-size:18px;
 
 <body>
 
+<div class="container">
+
 <h1>Cortex Agent</h1>
 
-<p>Ask anything</p>
-
-<input id="query" placeholder="Example: top 5 laptops under 80000">
+<input id="query" placeholder="Ask anything..." />
 
 <button onclick="ask()">Ask</button>
 
-<div id="result"></div>
+<div class="result" id="result"></div>
+
+</div>
 
 <script>
 
 async function ask(){
 
-const query=document.getElementById("query").value;
+let q=document.getElementById("query").value
 
-const res=await fetch("http://127.0.0.1:8000/ask",{
-
+let res=await fetch("http://127.0.0.1:8000/ask",{
 method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({
-task:query
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({task:q})
 })
 
-});
+let data=await res.json()
 
-const data=await res.json();
-
-document.getElementById("result").innerText=data.result;
+document.getElementById("result").innerText=data.result
 
 }
 
