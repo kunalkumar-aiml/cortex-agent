@@ -1,15 +1,15 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 
 from cortex.brain.task_planner import TaskPlanner
-from cortex.executor.agent_executor import AgentExecutor
 from cortex.tools.browser_tool import BrowserTool
+from cortex.executor.agent_executor import AgentExecutor
+
+from langchain_community.chat_models import ChatOllama
 
 
-app = FastAPI(title="Cortex Agent API")
+app = FastAPI()
 
-# CORS fix so browser UI can talk to API
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -18,25 +18,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-planner = TaskPlanner()
+# Local LLM (Ollama)
+llm = ChatOllama(model="llama3")
+
+# Components
+planner = TaskPlanner(llm)
 
 tools = {
     "browser": BrowserTool()
 }
 
-executor = AgentExecutor(planner, tools)
-
-
-class Query(BaseModel):
-    task: str
+executor = AgentExecutor(planner, tools, llm)
 
 
 @app.post("/ask")
-def ask_agent(query: Query):
+async def ask(data: dict):
 
-    result = executor.run(query.task)
+    task = data.get("task")
 
-    return {
-        "query": query.task,
-        "result": result
-    }
+    result = executor.run(task)
+
+    return {"result": result}
