@@ -10,7 +10,10 @@ class BrowserTool:
             "User-Agent": "Mozilla/5.0"
         }
 
-        url = f"https://www.google.com/search?q={query}"
+        # force latest results
+        query = query + " 2025 2026 latest laptop specs"
+
+        url = f"https://www.google.com/search?q={query}&num=10"
 
         response = requests.get(url, headers=headers)
 
@@ -18,7 +21,18 @@ class BrowserTool:
 
         results = []
 
-        for h in soup.select("h3")[:15]:
-            results.append(h.text)
+        for g in soup.select("div.g"):
 
-        return results
+            title = g.select_one("h3")
+            desc = g.select_one("span")
+
+            if title:
+                text = title.text
+
+                # remove old models
+                if "2021" in text or "2022" in text or "2023" in text:
+                    continue
+
+                results.append(text)
+
+        return results[:10]
