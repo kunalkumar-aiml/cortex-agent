@@ -23,12 +23,13 @@ class AgentExecutor:
 
         results = []
 
-        # Run browser search
         if "browser" in self.tools:
+
             res = self.tools["browser"].search_google(task)
+
             results.extend(res)
 
-        print("\nGenerating final answer...\n")
+        print("\nGenerating AI recommendation...\n")
 
         final_prompt = f"""
 User Query: {task}
@@ -36,16 +37,18 @@ User Query: {task}
 Search Results:
 {results}
 
-IMPORTANT RULES:
-- Do NOT explain steps
-- Do NOT give planning
-- Do NOT write long paragraphs
-- Only give the final answer
+Rules for answering:
 
-If the user asks for TOP or BEST items,
-return a clean numbered list.
+1. Give direct recommendations.
+2. If the user asks for TOP or BEST items, return a numbered list.
+3. Keep the answer short and clean.
+4. If the budget is mentioned (example: under 80k), recommend items within that budget.
+5. After the main list, suggest 1-2 better options if the user can increase the budget slightly (₹2k-₹5k more).
+6. Do not explain planning or steps.
 
 Example format:
+
+Top 5 Best Options:
 
 1. Item name
 2. Item name
@@ -53,7 +56,10 @@ Example format:
 4. Item name
 5. Item name
 
-Only return the list.
+If you can increase your budget slightly, these are even better:
+
+• Item name
+• Item name
 """
 
         answer = self.planner.create_plan(final_prompt)
