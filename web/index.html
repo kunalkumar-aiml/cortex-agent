@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 
 <title>Cortex AI Agent</title>
@@ -44,7 +45,6 @@ margin-left:10px;
 
 #result{
 margin-top:30px;
-font-size:18px;
 max-width:700px;
 text-align:left;
 }
@@ -78,8 +78,6 @@ left:0;
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
 
 <script>
-
-/* 3D BACKGROUND */
 
 const scene = new THREE.Scene()
 
@@ -123,7 +121,6 @@ renderer.render(scene,camera)
 animate()
 
 
-/* SEARCH FUNCTION */
 
 async function ask(){
 
@@ -149,21 +146,11 @@ let data = await res.json()
 
 let html=""
 
-if(data.result){
-
 data.result.forEach(r=>{
 html += "<p>• "+r+"</p>"
 })
 
-}
-
-else{
-
-html="No results found"
-
-}
-
-document.getElementById("result").innerHTML = html
+document.getElementById("result").innerHTML=html
 
 }
 
