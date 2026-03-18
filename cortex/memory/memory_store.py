@@ -1,24 +1,36 @@
 import json
 import os
+from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
 
 
 class MemoryStore:
 
     def __init__(self, file_path="memory.json"):
+
         self.file_path = file_path
+        self.model = SentenceTransformer("all-MiniLM-L6-v2")
 
         if not os.path.exists(self.file_path):
             with open(self.file_path, "w") as f:
                 json.dump([], f)
 
-    def save(self, task, result):
+    def load(self):
 
         with open(self.file_path, "r") as f:
-            data = json.load(f)
+            return json.load(f)
+
+    def save(self, task, result):
+
+        data = self.load()
+
+        embedding = self.model.encode(task).tolist()
 
         entry = {
             "task": task,
-            "result": result
+            "result": result,
+            "embedding": embedding
         }
 
         data.append(entry)
@@ -28,13 +40,28 @@ class MemoryStore:
 
     def search(self, task):
 
-        with open(self.file_path, "r") as f:
-            data = json.load(f)
+        data = self.load()
 
-        task = task.lower()
+        if not data:
+            return None
+
+        query_embedding = self.model.encode(task)
+
+        similarities = []
 
         for item in data:
-            if any(word in item["task"].lower() for word in task.split()):
-                return item["result"]
+
+            emb = np.array(item["embedding"]).reshape(1, -1)
+
+            sim = cosine_similarity(
+                [query_embedding], emb
+            )[0][0]
+
+            similarities.append(sim)
+
+        best_index = int(np.argmax(similarities))
+
+        if similarities[best_index] > 0.7:
+            return data[best_index]["result"]
 
         return None
