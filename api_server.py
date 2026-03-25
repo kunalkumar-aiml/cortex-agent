@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import requests
-from bs4 import BeautifulSoup
+import xml.etree.ElementTree as ET
 
 app = FastAPI()
 
@@ -22,33 +22,17 @@ def ask(data: dict):
 
     query = data.get("task")
 
-    url = "https://html.duckduckgo.com/html/"
+    url = f"https://news.google.com/rss/search?q={query}"
 
-    params = {
-        "q": query
-    }
+    r = requests.get(url)
 
-    headers = {
-        "User-Agent": "Mozilla/5.0"
-    }
-
-    r = requests.get(url, params=params, headers=headers)
-
-    soup = BeautifulSoup(r.text, "html.parser")
+    root = ET.fromstring(r.content)
 
     results = []
 
-    links = soup.find_all("a")
-
-    for link in links:
-
-        text = link.get_text()
-
-        if text and len(text) > 30:
-            results.append(text)
-
-        if len(results) == 10:
-            break
+    for item in root.findall(".//item")[:10]:
+        title = item.find("title").text
+        results.append(title)
 
     return {
         "query": query,
