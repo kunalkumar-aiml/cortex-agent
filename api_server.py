@@ -5,7 +5,6 @@ from bs4 import BeautifulSoup
 
 app = FastAPI()
 
-# Allow frontend requests
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -23,20 +22,33 @@ def ask(data: dict):
 
     query = data.get("task")
 
-    url = f"https://duckduckgo.com/html/?q={query}"
+    url = "https://html.duckduckgo.com/html/"
+
+    params = {
+        "q": query
+    }
 
     headers = {
         "User-Agent": "Mozilla/5.0"
     }
 
-    r = requests.get(url, headers=headers)
+    r = requests.get(url, params=params, headers=headers)
 
     soup = BeautifulSoup(r.text, "html.parser")
 
     results = []
 
-    for a in soup.select(".result__a")[:10]:
-        results.append(a.get_text())
+    links = soup.find_all("a")
+
+    for link in links:
+
+        text = link.get_text()
+
+        if text and len(text) > 30:
+            results.append(text)
+
+        if len(results) == 10:
+            break
 
     return {
         "query": query,
