@@ -8,51 +8,38 @@
 <style>
 
 body{
-margin:0;
+font-family:Arial;
 background:#0f172a;
 color:white;
-font-family:Arial;
-overflow:hidden;
-}
-
-#ui{
-position:absolute;
-top:40%;
-left:50%;
-transform:translate(-50%,-50%);
 text-align:center;
-z-index:10;
+padding-top:100px;
 }
 
 input{
-width:420px;
-padding:14px;
+width:400px;
+padding:12px;
 font-size:18px;
+border-radius:8px;
 border:none;
-border-radius:10px;
 }
 
 button{
-padding:14px 24px;
+padding:12px 20px;
 font-size:18px;
-border:none;
-border-radius:10px;
 background:#22c55e;
+border:none;
+border-radius:8px;
 color:white;
 cursor:pointer;
 margin-left:10px;
 }
 
 #result{
-margin-top:30px;
+margin-top:40px;
 max-width:700px;
+margin-left:auto;
+margin-right:auto;
 text-align:left;
-}
-
-canvas{
-position:absolute;
-top:0;
-left:0;
 }
 
 </style>
@@ -60,8 +47,6 @@ left:0;
 </head>
 
 <body>
-
-<div id="ui">
 
 <h1>Cortex AI Agent</h1>
 
@@ -71,64 +56,15 @@ left:0;
 
 <div id="result"></div>
 
-</div>
-
-<canvas id="bg"></canvas>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-
 <script>
-
-const scene = new THREE.Scene()
-
-const camera = new THREE.PerspectiveCamera(
-75,
-window.innerWidth/window.innerHeight,
-0.1,
-1000
-)
-
-const renderer = new THREE.WebGLRenderer({
-canvas:document.getElementById("bg")
-})
-
-renderer.setSize(window.innerWidth,window.innerHeight)
-
-const geometry = new THREE.TorusKnotGeometry(10,3,100,16)
-
-const material = new THREE.MeshBasicMaterial({
-color:0x22c55e,
-wireframe:true
-})
-
-const knot = new THREE.Mesh(geometry,material)
-
-scene.add(knot)
-
-camera.position.z = 30
-
-function animate(){
-
-requestAnimationFrame(animate)
-
-knot.rotation.x += 0.01
-knot.rotation.y += 0.01
-
-renderer.render(scene,camera)
-
-}
-
-animate()
-
-
 
 async function ask(){
 
-let query = document.getElementById("query").value
+let q=document.getElementById("query").value
 
 document.getElementById("result").innerHTML="Searching..."
 
-let res = await fetch("http://127.0.0.1:8000/ask",{
+let res=await fetch("http://127.0.0.1:8000/ask",{
 
 method:"POST",
 
@@ -137,30 +73,28 @@ headers:{
 },
 
 body:JSON.stringify({
-task:query
+task:q
 })
 
 })
 
-let data = await res.json()
+let data=await res.json()
 
 let html=""
 
-if(data.result){
+if(data.result && data.result.length>0){
 
 data.result.forEach(r=>{
 html += "<p>• "+r+"</p>"
 })
 
-}
-
-else{
+}else{
 
 html="No results found"
 
 }
 
-document.getElementById("result").innerHTML = html
+document.getElementById("result").innerHTML=html
 
 }
 
